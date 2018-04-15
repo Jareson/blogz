@@ -22,7 +22,9 @@ class Blog(db.Model):
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
     blog_entries = Blog.query.all()
-    return render_template("blog.html", blog_entries=blog_entries)
+    blog_id = request.args.get('id')
+    blog_query = Blog.query.filter_by(id=blog_id).first()
+    return render_template("blog.html", blog_entries=blog_entries, blog_query=blog_query)
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
     title = ""
@@ -41,7 +43,11 @@ def new_post():
             new_entry= Blog(title, body)
             db.session.add(new_entry)
             db.session.commit()
-            return redirect('/')
+            new_entry = Blog.query.filter_by(title=new_entry.title, body=new_entry.body).first()
+            print(new_entry)
+            new_id = str(new_entry.id)
+            print(new_id)
+            return redirect('/blog?id=' + new_id)
     return render_template('newpost.html', title=title, body=body)
 @app.route('/', methods=['POST', 'GET'])
 def index():
