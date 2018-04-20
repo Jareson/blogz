@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% if not blog_query %}
+    {% if not blog_entries %}
+    <h1 align="center">Build a Blog</h1>
+    <p>There are no blogs</p>
+    {% elif not blog_query %}
     <h1 align="center">Build a Blog</h1>
         {% for blog in blog_entries %}
             <a href="/blog?id={{blog.id}}"><h2>{{blog.title}}</h2></a>

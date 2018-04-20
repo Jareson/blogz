@@ -9,11 +9,20 @@
         </style>
     </head>
     <body>
-
         <div>
-            <a href='/blog'>Main Blog Page</a>
-            <a href='/newpost'>Add a Blog Entry</a>
-            <a href='/logout'>Logout</a>
+            <div align="left">
+                <a href='/'>Home</a>
+                <a href='/blog'>Main Blog Page</a>
+                <a href='/newpost'>Add a Blog Entry</a>
+            </div>
+            {% if "email" not in session %}
+            <div align="right">
+                <a href='/login'>Login</a>
+            {% else %}
+            <div align='right'>
+                <a href='/logout'>Logout</a>
+            </div>
+            {% endif %}
         </div>
 
         {% with messages = get_flashed_messages(with_categories=True) %}

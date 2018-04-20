@@ -33,18 +33,29 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'signup']
+    allowed_routes = ['login', 'signup', 'blog', 'index']
     if request.endpoint not in allowed_routes and "email" not in session:
         return redirect('/login')
 
 
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
-    owner = User.query.filter_by(email=session['email']).first()
-    blog_entries = Blog.query.filter_by(owner=owner).all()
-    # blog_id = request.args.get('id')
-    # blog_query = Blog.query.filter_by(id=blog_id).first()
-    return render_template("blog.html", blog_entries=blog_entries)
+    blog_entries = Blog.query.all()
+    blog_id = request.args.get('id')
+    blog_user = request.args.get('user')
+    if not blog_id and not blog_user:
+        return render_template('blog.html', blog_entries=blog_entries)
+    elif blog_id: 
+        if int(blog_id) > 0:
+            blog_query = Blog.query.filter_by(id=blog_id).first()
+            return render_template("singlePost.html", blog_query=blog_query)
+    elif blog_user:
+        blog_user = int(blog_user)
+        blog_user = User.query.filter_by(id=blog_user).first()
+        user_blogs = Blog.query.filter_by(owner_id=blog_user.id).all()
+        # user_blogs = Blog.query.filter_by(id=user_blogs).all()
+        return render_template('singleUser.html', user_blogs=user_blogs)
+    return render_template("blog.html", blog_entries=blog_entries, blog_query=blog_query)
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
@@ -65,15 +76,17 @@ def new_post():
             new_entry= Blog(title, body, owner)
             db.session.add(new_entry)
             db.session.commit()
-            # new_entry = Blog.query.filter_by(title=new_entry.title, body=new_entry.body).first()
-            # print(new_entry)
-            # new_id = str(new_entry.id)
-            # print(new_id)
-            return redirect('/blog')
+            new_entry = Blog.query.filter_by(title=new_entry.title, body=new_entry.body).first()
+            print(new_entry)
+            new_id = str(new_entry.id)
+            print(new_id)
+            return redirect('/blog?id='+ new_id)
     return render_template('newpost.html', title=title, body=body)
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
+    # TODO setup login verification properly
+    email = ''
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -81,6 +94,8 @@ def signup():
         existing_user = User.query.filter_by(email=email).first()
         if not email or not password:
             flash('Must enter an email and a password', 'error')
+        elif len(email) < 3 or len(password) < 3:
+            flash('Email and password must be longer than 3 character', 'error')
         elif password != verify:
             flash('Passwords do not match', 'error')
         elif not existing_user:
@@ -92,7 +107,7 @@ def signup():
         else:
             flash('Duplicate User', 'error')
 
-    return render_template('signup.html')
+    return render_template('signup.html', email=email)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -111,17 +126,14 @@ def login():
             
     return render_template('login.html')
 
-@app.route('/index')
+@app.route('/')
 def index():
-    return render_template('index.html')
+    user_list = User.query.all()
+    return render_template('index.html', user_list=user_list)
 
 @app.route('/logout')
 def logout():
     del session['email']
-    return redirect('/blog')
-
-@app.route('/', methods=['POST', 'GET'])
-def home():
     return redirect('/blog')
 
 if __name__ == '__main__':
