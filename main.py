@@ -7,6 +7,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:Blogz!@localhost:
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = "sUtIm6jEdz"
+app.static_folder = 'static'
 
 class Blog(db.Model):
 
@@ -33,7 +34,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'signup', 'blog', 'index']
+    allowed_routes = ['login', 'signup', 'blog', 'index', 'static']
     if request.endpoint not in allowed_routes and "email" not in session:
         return redirect('/login')
 

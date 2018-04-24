@@ -1,29 +1,20 @@
 <!doctype html>
 <html>
     <head>
+        <link type = "text/css" rel = "stylesheet" href= "{{ url_for('static', filename='styles/styles.css') }}" />
         <title>{{title}}</title>
-        <style>
-            .error {
-                color: red;
-            }
-        </style>
     </head>
     <body>
-        <div>
-            <div align="left">
-                <a href='/'>Home</a>
-                <a href='/blog'>Main Blog Page</a>
-                <a href='/newpost'>Add a Blog Entry</a>
-            </div>
+            <span>
+                <a class = "navoption" href='/'>Home</a></td>
+                <a class = "navoption" href='/blog'>Main Blog Page</a></td>
+                <a class = "navoption" href='/newpost'>Add a Blog Entry</a></td>
             {% if "email" not in session %}
-            <div align="right">
-                <a href='/login'>Login</a>
+                <a class = "logStatus" href='/login'>Login</a></td>
             {% else %}
-            <div align='right'>
-                <a href='/logout'>Logout</a>
-            </div>
+                <a class = "logStatus" href='/logout'>Logout</a></td>
             {% endif %}
-        </div>
+            </span>
 
         {% with messages = get_flashed_messages(with_categories=True) %}
             <ul>

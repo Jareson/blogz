@@ -1,0 +1,15 @@
+html {
+    background-color: orange;
+}
+
+.error {
+    color: red;
+}
+
+.navoption {
+    text-align: center;
+}
+
+.logStatus {
+    text-align: right;
+}
